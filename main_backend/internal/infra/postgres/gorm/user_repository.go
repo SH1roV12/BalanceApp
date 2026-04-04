@@ -5,6 +5,7 @@ import (
 
 	"github.com/SH1roV12/balance/internal/domain/entity"
 	"github.com/SH1roV12/balance/internal/infra/errorsrepo"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -18,10 +19,11 @@ type User struct{
 
 type UserRepository struct{
 	db *gorm.DB
+	sugar *zap.SugaredLogger
 }
 
-func NewUserRepository(db *gorm.DB)*UserRepository{
-	return &UserRepository{db: db}
+func NewUserRepository(db *gorm.DB,sugar *zap.SugaredLogger)*UserRepository{
+	return &UserRepository{db: db, sugar: sugar}
 }
 
 func EntityToGorm(user *entity.User)*User{
@@ -52,13 +54,13 @@ func GormsToEntitys(users []*User)[]*entity.User{
 	return entityUsers
 }
 
-func(repo *UserRepository) Create(ctx context.Context,user *entity.User)error{
+func(repo *UserRepository) Create(ctx context.Context,user *entity.User)(*entity.User,error){
 	gormUser := EntityToGorm(user)
 	err := repo.db.WithContext(ctx).Create(&gormUser).Error
 	if err !=nil{
-		return errorsrepo.ErrCannotCreateUser
+		return nil,errorsrepo.ErrCannotCreateUser
 	}
-	return nil
+	return GormToEntity(gormUser),nil
 }
 
 func(repo *UserRepository) GetAll(ctx context.Context)([]*entity.User,error){
@@ -68,4 +70,14 @@ func(repo *UserRepository) GetAll(ctx context.Context)([]*entity.User,error){
 		return nil,err
 	}
 	return GormsToEntitys(users), nil
+}
+
+
+func(repo *UserRepository) GetByID(ctx context.Context, user_id string)(*entity.User,error){
+	var user *User
+	err := repo.db.WithContext(ctx).First(&user).Where("id = ?", user_id).Error
+	if err != nil{
+		return nil,err
+	}
+	return GormToEntity(user),nil
 }

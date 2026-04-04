@@ -1,10 +1,9 @@
 package config
 
 import (
-	"log"
 	"os"
 
-	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
 type Config struct{
@@ -24,12 +23,12 @@ type Database struct{
 type Api struct{
 	Port string
 }
-func GetConfig()*Config{
-	err := godotenv.Load()
-	if err != nil{
-		log.Println("Failed to load .env")
-	}
-
+func GetConfig(sugar *zap.SugaredLogger)*Config{
+	// err := godotenv.Load()
+	// if err != nil{
+	// 	sugar.Infow("Failed to load .env")
+	// }
+	sugar.Infow("env file","DB_HOST", os.Getenv("DB_HOST") )
 	return &Config{
 		DB: &Database{
 			Host: os.Getenv("DB_HOST"),

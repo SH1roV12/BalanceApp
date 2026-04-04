@@ -8,6 +8,7 @@ import (
 )
 
 type Service interface{
-	NewUser(ctx context.Context,req *request.RegisterUser)(error)
+	NewUser(ctx context.Context, req *request.RegisterUser)(*entity.User,error)
 	GetAll(ctx context.Context)([]*entity.User,error)
+	GetById(ctx context.Context, user_id string)(*entity.User, error)
 }
