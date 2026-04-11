@@ -9,6 +9,7 @@ type User struct{
 	LastName  string `json:"last_name"`
 	Username  string `json:"username"`
 	Balance   float64 `json:"balance"`
+	Email     string  `json:"email"`
 }
 
 func FromEntityToDTO(user *entity.User)*User{
@@ -18,6 +19,7 @@ func FromEntityToDTO(user *entity.User)*User{
 		LastName: user.LastName,
 		Username: user.Username,
 		Balance: user.Balance,
+		Email:   user.Email,
 	}
 }
 

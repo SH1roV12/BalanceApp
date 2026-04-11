@@ -14,6 +14,7 @@ func SetupRoutes(app *fiber.App,handlers *handler.Handlers){
 	api.Get("/users",handlers.GetAllUsers)
 	api.Get("/refresh",handlers.Refresh)
 	auth.Get("/get",handlers.GetUserByID)
+	api.Get("/login",handlers.Login)
 }
 
 

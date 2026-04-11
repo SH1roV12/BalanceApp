@@ -8,7 +8,8 @@ import (
 
 
 type Repository interface{
-	Create(ctx context.Context,user *entity.User)(*entity.User,error)
-	GetAll(ctx context.Context)([]*entity.User,error)
-	GetByID(ctx context.Context, user_id string)(*entity.User,error)
+	CreateUser(ctx context.Context,user *entity.User)(error)
+	GetAllUsers(ctx context.Context)([]*entity.User,error)
+	GetUserByID(ctx context.Context, user_id string)(*entity.User,error)
+	GetUserByEmail(ctx context.Context, email string)(*entity.User, error)
 }

@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"errors"
 	"time"
 
+	customErrors "github.com/SH1roV12/balance/internal/pkg/errors"
 	"github.com/SH1roV12/balance/internal/pkg/jwt"
 	"github.com/SH1roV12/balance/internal/transport/http/dto/request"
 	"github.com/SH1roV12/balance/internal/transport/http/dto/response"
@@ -15,15 +17,42 @@ import (
 
 func(h *Handlers) Register(ctx *fiber.Ctx)error{
 	var req request.RegisterUser
-	
 	if err := ctx.BodyParser(&req); err !=nil{
 		h.sugar.Errorw("register", "parse req","error",err.Error())
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error":"bad request"})
 	}
-	user,err := h.userService.NewUser(ctx.Context(),&req)
+	err := h.userService.NewUser(ctx.Context(),&req)
 	if err != nil{
+		var customErr customErrors.MyError
+		errors.As(err,&customErr)
+		if errors.Is(err, customErrors.Repo.User.AlreadyExist){
+			h.sugar.Errorw(customErr.Location,"error",customErr.RawError )
+			return ctx.Status(fiber.StatusConflict).JSON(fiber.Map{"error":err.Error()})
+		}
+		h.sugar.Errorw(customErr.Location,"error",customErr.RawError )
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error":err.Error()})
 	}
+	
+	return ctx.Status(fiber.StatusCreated).JSON(fiber.Map{"message":"successfully registered"})
+}
+
+
+func (h *Handlers) Login(ctx *fiber.Ctx)error{
+	var req request.Login
+	if err := ctx.BodyParser(&req); err != nil{
+		h.sugar.Errorw("login", "parse req","error",err.Error())
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error":"bad request"})
+	}
+	user,err := h.userService.GetByEmail(ctx.Context(),req.Email, req.Password)
+	
+	
+	if err!=nil{
+		var customErr customErrors.MyError
+		errors.As(err,&customErr)
+		h.sugar.Errorw(customErr.Location,"error",customErr.RawError )
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error":err.Error()}) // Match to password wrong 
+	}
+	
 	access,err := jwt.GenAccessToken(user.ID,h.sugar)
 	if err != nil{
 		h.sugar.Errorw("jwt_refresh","get access token", "error", err)
@@ -51,16 +80,21 @@ func(h *Handlers) Register(ctx *fiber.Ctx)error{
 		Secure: false,
 		SameSite: "Lax",
 	})
-	return ctx.Status(fiber.StatusCreated).JSON(response.FromEntityToDTO(user))
-}
 
+	return ctx.Status(fiber.StatusOK).JSON(response.FromEntityToDTO(user))
+}
 
 
 func(h *Handlers)GetAllUsers(ctx *fiber.Ctx)error{
 	users,err := h.userService.GetAll(ctx.Context())
+	
 	if err != nil{
+		var customErr customErrors.MyError
+		errors.As(err,&customErr)
+		h.sugar.Errorw(customErr.Location,"error",customErr.RawError )
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error":err.Error()})
 	}
+	
 	return ctx.Status(fiber.StatusOK).JSON(response.FromEntitysToDTOs(users))
 }
 
@@ -104,7 +138,11 @@ func(h *Handlers)Refresh(ctx *fiber.Ctx)error{
 func(h *Handlers)GetUserByID(ctx *fiber.Ctx)error{
 	user_id := ctx.Locals("user_id").(string)
 	user,err := h.userService.GetById(ctx.Context(),user_id)
+
 	if err != nil{
+		var customErr customErrors.MyError
+		errors.As(err,&customErr)
+		h.sugar.Errorw(customErr.Location,"error",customErr.RawError )
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error":err.Error()})
 	}
 	return ctx.Status(fiber.StatusOK).JSON(response.FromEntityToDTO(user))
