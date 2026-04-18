@@ -5,6 +5,7 @@ import (
 
 	"github.com/SH1roV12/balance/internal/pkg/jwt"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
 
@@ -17,4 +18,23 @@ func JWTMidleware(c *fiber.Ctx)error{
 	c.Locals("user_id",user_id)
 	return c.Next()
 
+}
+
+func Logger(sugar *zap.SugaredLogger)fiber.Handler{
+	return func(c *fiber.Ctx)error{
+		sugar.Infow("incoming request",
+            "method", c.Method(),
+            "path",   c.Path(),
+            "ip",     c.IP(),
+        )
+
+        err := c.Next()
+
+        sugar.Infow("request completed",
+            "status", c.Response().StatusCode(),
+            "path",   c.Path(),
+        )
+
+        return err
+	}
 }

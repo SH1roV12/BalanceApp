@@ -6,6 +6,7 @@ import (
 
 	"github.com/SH1roV12/balance/internal/pkg/config"
 	"github.com/SH1roV12/balance/internal/service"
+	mathservice "github.com/SH1roV12/balance/internal/service/math_service"
 	http "github.com/SH1roV12/balance/internal/transport/http/fiber"
 	"github.com/SH1roV12/balance/internal/transport/http/fiber/handler"
 	"github.com/gofiber/fiber/v2"
@@ -14,10 +15,10 @@ import (
 
 
 
-func StartApi(config *config.Config, userService *service.UserService,ctx context.Context,sugar *zap.SugaredLogger)error{
+func StartApi(config *config.Config, userService *service.UserService,mathService mathservice.MathService,ctx context.Context,sugar *zap.SugaredLogger)error{
 	app := fiber.New()
-	handlers := handler.NewHandlers(userService,sugar)
-	http.SetupRoutes(app,handlers)
+	handlers := handler.NewHandlers(userService,mathService,sugar)
+	http.SetupRoutes(app,handlers,sugar)
 
 
 	errChan := make(chan error,1)
