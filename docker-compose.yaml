@@ -9,6 +9,13 @@ services:
       - "${API_PORT}:8080"
     depends_on:
       - db
+      - math
+  math:
+    env_file:
+      - .env
+    build: 
+      context: ./math
+      dockerfile: Dockerfile
   db: 
     image: postgres:16-alpine
     restart: always

@@ -52,3 +52,77 @@
 └── tree.txt
 
 28 directories, 24 files
+.
+├── docker-compose.yaml
+├── main_backend
+│   ├── cmd
+│   │   └── app
+│   │       └── main.go
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   └── internal
+│       ├── domain
+│       │   ├── entity
+│       │   │   └── user.go
+│       │   └── user
+│       │       ├── repository.go
+│       │       └── service.go
+│       ├── infra
+│       │   ├── pgx
+│       │   └── postgres
+│       │       └── gorm
+│       │           ├── postgres.go
+│       │           └── user_repository.go
+│       ├── pkg
+│       │   ├── config
+│       │   │   └── config.go
+│       │   ├── errors
+│       │   │   ├── errors.go
+│       │   │   └── errorslib.go
+│       │   ├── id_generator
+│       │   │   └── uuid
+│       │   │       └── id_generator.go
+│       │   ├── jwt
+│       │   │   └── jwt.go
+│       │   ├── middleware
+│       │   │   └── middleware.go
+│       │   └── passwordHasher
+│       │       └── bcrypt
+│       │           └── hashPassword.go
+│       ├── service
+│       │   └── user_service.go
+│       ├── start
+│       │   ├── api.go
+│       │   └── start.go
+│       └── transport
+│           ├── gRPC
+│           └── http
+│               ├── dto
+│               │   ├── request
+│               │   │   └── user.go
+│               │   └── response
+│               │       └── user.go
+│               └── fiber
+│                   ├── handler
+│                   │   ├── handlers.go
+│                   │   └── user_handler.go
+│                   └── router.go
+├── math
+│   ├── cmd
+│   │   └── app
+│   │       └── main.go
+│   ├── go.mod
+│   ├── go.sum
+│   └── internal
+│       ├── service
+│       │   └── service.go
+│       └── start
+│           └── start.go
+├── math.proto
+├── pb
+│   ├── math_grpc.pb.go
+│   └── math.pb.go
+└── tree.txt
+
+38 directories, 34 files

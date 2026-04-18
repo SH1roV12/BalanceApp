@@ -147,3 +147,6 @@ func(h *Handlers)GetUserByID(ctx *fiber.Ctx)error{
 	}
 	return ctx.Status(fiber.StatusOK).JSON(response.FromEntityToDTO(user))
 }
+
+
+

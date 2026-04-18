@@ -9,6 +9,7 @@ import (
 type Config struct{
 	DB *Database
 	Api *Api
+	GRPC *GRPC
 }
 
 type Database struct{
@@ -18,6 +19,10 @@ type Database struct{
 	DBName  string
 	Port string
 	SSlMode string
+}
+
+type GRPC struct{
+	Port string
 }
 
 type Api struct{
@@ -40,6 +45,9 @@ func GetConfig(sugar *zap.SugaredLogger)*Config{
 		},
 		Api: &Api{
 			Port: os.Getenv("API_PORT"),
+		},
+		GRPC: &GRPC{
+			Port: os.Getenv("GRPC_PORT"),
 		},
 	}
 }
