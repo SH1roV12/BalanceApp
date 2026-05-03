@@ -106,3 +106,18 @@ func(repo *UserRepository) GetUserByEmail(ctx context.Context, email string)(*en
 	}
 	return GormToEntity(user),nil
 }
+
+
+func(repo *UserRepository) AddBalance(ctx context.Context, user_id string,amount float64)(error){
+	return repo.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		result := tx.Model(&User{}).Where("id = ?",user_id).Update("balance",gorm.Expr("balance + ?",amount))
+		if result.Error != nil{
+			return result.Error
+		}
+
+		if result.RowsAffected == 0{
+			return customErrors.NewRepoAppError(customErrors.Repo.User.NotFound,nil,"add balance")
+		}
+		return nil
+	})
+}

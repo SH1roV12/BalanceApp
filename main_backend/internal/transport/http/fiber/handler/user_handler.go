@@ -6,8 +6,9 @@ import (
 
 	customErrors "github.com/SH1roV12/balance/internal/pkg/errors"
 	"github.com/SH1roV12/balance/internal/pkg/jwt"
-	"github.com/SH1roV12/balance/internal/transport/http/dto/request"
-	"github.com/SH1roV12/balance/internal/transport/http/dto/response"
+	"github.com/SH1roV12/balance/internal/transport/dto/request"
+	"github.com/SH1roV12/balance/internal/transport/dto/response"
+
 	"github.com/gofiber/fiber/v2"
 )
 

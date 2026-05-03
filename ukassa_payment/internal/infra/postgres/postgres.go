@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/SH1roV12/balance/ukassa/internal/pkg/config"
+
 	"go.uber.org/zap"
 	driver "gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -29,19 +30,20 @@ func StartDB(cfg *config.Database, sugar *zap.SugaredLogger)*Postgres{
 			break
 		}
 
-		sugar.Warnw("postgres", "start db", "retry", i+1)
+		sugar.Warnw("postgres",
+		"retry", i+1)
 	}
 
 	
 	if err != nil{
-		sugar.Warnw("postgres", "start db", "cannot connect to db")
+		sugar.Warnw("postgres", "error", "cannot connect to db")
 		os.Exit(1)
 	}
-	sugar.Infow("postgres", "start db", "migrating...")
+	sugar.Infow("postgres", "", "migrating...")
 	err = migrate(db)
 
 	if err != nil{
-		sugar.Warnw("postgres", "start db", "cannot migrate db")
+		sugar.Warnw("postgres", "error", "cannot migrate db")
 		os.Exit(1)
 	}
 	sugar.Infow("postgres", "start db", "successfully connected")
@@ -63,5 +65,5 @@ func DSN(cfg *config.Database)string{
 }
 
 func migrate(db *Postgres)error{
-	return  db.AutoMigrate()
+	return  db.AutoMigrate(&Transaction{})
 }

@@ -22,7 +22,8 @@ type Database struct{
 }
 
 type GRPC struct{
-	Port string
+	PaymentPort string
+	ConfirmPort string
 }
 
 type Api struct{
@@ -44,10 +45,11 @@ func GetConfig(sugar *zap.SugaredLogger)*Config{
 			SSlMode: os.Getenv("DB_SSL"),
 		},
 		Api: &Api{
-			Port: os.Getenv("API_PORT"),
+			Port: os.Getenv("APP_PORT"),
 		},
 		GRPC: &GRPC{
-			Port: os.Getenv("GRPC_PORT"),
+			PaymentPort: os.Getenv("GRPC_PORT_PAYMENT"),
+			ConfirmPort: os.Getenv("GRPC_PORT_CONFIRM"),
 		},
 	}
 }

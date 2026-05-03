@@ -8,13 +8,17 @@ import (
 	"github.com/SH1roV12/balance/ukassa/internal/transport/dto/request"
 )
 
-type UKassaPayment struct{
+type YooKassaPayment struct{
 	service service.Service
 	pb.UnimplementedUKassaPaymentServer
 }
 
-func (u *UKassaPayment) CreatePayment(ctx context.Context,in *pb.CreatePaymentRequest) (*pb.CreatePaymentResponse, error){
-	url,err := u.service.CreatePayment(ctx,request.ToDomain(in))
+func NewYooKassaPayment(service service.Service)YooKassaPayment{
+	return YooKassaPayment{service: service, UnimplementedUKassaPaymentServer: pb.UnimplementedUKassaPaymentServer{}}
+}
+
+func (u *YooKassaPayment) CreatePayment(ctx context.Context,in *pb.CreatePaymentRequest) (*pb.CreatePaymentResponse, error){
+	url,err := u.service.CreatePayment(ctx,request.ToDomainCreatePayment(in))
 	if err != nil{
 		return nil,err
 	}

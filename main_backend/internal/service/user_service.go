@@ -8,9 +8,8 @@ import (
 	"github.com/SH1roV12/balance/internal/domain/user"
 	"github.com/SH1roV12/balance/internal/pkg/id_generator/uuid"
 	passwordHash "github.com/SH1roV12/balance/internal/pkg/passwordHasher/bcrypt"
+	"github.com/SH1roV12/balance/internal/transport/dto/request"
 	"go.uber.org/zap"
-
-	"github.com/SH1roV12/balance/internal/transport/http/dto/request"
 )
 
 type UserService struct{
@@ -51,4 +50,12 @@ func(s *UserService) GetByEmail(ctx context.Context, email,password string)(*ent
 		return nil,errors.New("wrong password")
 	}
 	return user,nil
+}
+
+func(s *UserService)SetBalance(ctx context.Context, req *request.Replenishment)error{
+	err := s.repo.AddBalance(ctx,req.UserId,float64(req.Amount))
+	if err != nil{
+		return err
+	}
+	return nil
 }

@@ -6,7 +6,8 @@ import (
 
 	"github.com/SH1roV12/balance/internal/pkg/config"
 	"github.com/SH1roV12/balance/internal/service"
-	mathservice "github.com/SH1roV12/balance/internal/service/math_service"
+	paymentservice "github.com/SH1roV12/balance/internal/service/payment"
+
 	http "github.com/SH1roV12/balance/internal/transport/http/fiber"
 	"github.com/SH1roV12/balance/internal/transport/http/fiber/handler"
 	"github.com/gofiber/fiber/v2"
@@ -15,9 +16,9 @@ import (
 
 
 
-func StartApi(config *config.Config, userService *service.UserService,mathService mathservice.MathService,ctx context.Context,sugar *zap.SugaredLogger)error{
+func StartApi(config *config.Config, userService *service.UserService,paymentService paymentservice.PaymentService,ctx context.Context,sugar *zap.SugaredLogger)error{
 	app := fiber.New()
-	handlers := handler.NewHandlers(userService,mathService,sugar)
+	handlers := handler.NewHandlers(userService,&paymentService,sugar)
 	http.SetupRoutes(app,handlers,sugar)
 
 

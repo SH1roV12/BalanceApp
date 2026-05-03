@@ -8,4 +8,5 @@ import (
 
 type Service interface{
 	CreatePayment(ctx context.Context, dto request.CreatePayment)(string,error)
+	ConfirmPayment(ctx context.Context, dto request.ConfirmPayment)error
 }

@@ -6,28 +6,29 @@ import (
 	"net"
 	"time"
 
-	pb "github.com/SH1roV12/balance/ukassa/internal/gen"
-	"github.com/SH1roV12/balance/ukassa/internal/pkg/config"
-	"github.com/SH1roV12/balance/ukassa/internal/service"
-	handler "github.com/SH1roV12/balance/ukassa/internal/transport/grpc"
+	"github.com/SH1roV12/balance/internal/domain/user"
+	"github.com/SH1roV12/balance/internal/gen/pb"
+	"github.com/SH1roV12/balance/internal/pkg/config"
+	handler "github.com/SH1roV12/balance/internal/transport/grpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
 
-func StartGRPC(service *service.Service, config config.GRPC, sugar *zap.SugaredLogger,ctx context.Context)error{
+
+func StartGRPC(service user.Service, config config.GRPC, sugar *zap.SugaredLogger,ctx context.Context)error{
 	sugar.Infow("grpc","starting..." )
-	gRPCHandler := handler.NewYooKassaPayment(service)
+	gRPCHandler := handler.NewYooKassaConfirmHandler(service)
 	errChan := make(chan error, 1)
 	grpcServer := grpc.NewServer()
 	go func() {
 		sugar.Infow("grpc", "opening tcp")
-		lis,err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s",config.PaymentPort))
+		lis,err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s",config.ConfirmPort))
 		if err != nil{
 			errChan <- err
 		}
 		
-		pb.RegisterUKassaPaymentServer(grpcServer,&gRPCHandler)
+		pb.RegisterUKassaPaymentConfirmationServer(grpcServer,&gRPCHandler)
 		grpcServer.Serve(lis)
 		
 	}()
