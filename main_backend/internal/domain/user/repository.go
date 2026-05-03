@@ -12,4 +12,5 @@ type Repository interface{
 	GetAllUsers(ctx context.Context)([]*entity.User,error)
 	GetUserByID(ctx context.Context, user_id string)(*entity.User,error)
 	GetUserByEmail(ctx context.Context, email string)(*entity.User, error)
+	AddBalance(ctx context.Context, user_id string,amount float64)(error)
 }

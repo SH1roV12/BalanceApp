@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package ukassaconfirmation;
+
+import "google/protobuf/empty.proto";
+
+
+option go_package = "github.com/SH1roV12/balance/proto/pb;pb";
+
+
+service UKassaPaymentConfirmation{
+    rpc ConfirmPayment (ConfirmPaymentRequest) returns (google.protobuf.Empty);
+}
+
+
+message ConfirmPaymentRequest{
+    string user_id = 1;
+    float amount = 2;
+}

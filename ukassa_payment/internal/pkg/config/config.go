@@ -3,13 +3,15 @@ package config
 import (
 	"os"
 
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
 
 type Config struct{
 	DB *Database
-	Api *Api
+	YooKassa *YooKassa
 	GRPC *GRPC
+	HTTP *HTTP
 }
 
 type Database struct{
@@ -21,20 +23,26 @@ type Database struct{
 	SSlMode string
 }
 
+type YooKassa struct{
+	ID string
+	SecretKey string
+	ReturnURL string
+}
+
 type GRPC struct{
 	PaymentPort string
 	ConfirmPort string
 }
 
-type Api struct{
+type HTTP struct{
 	Port string
 }
+
+
 func GetConfig(sugar *zap.SugaredLogger)*Config{
-	// err := godotenv.Load()
-	// if err != nil{
-	// 	sugar.Infow("Failed to load .env")
-	// }
-	sugar.Infow("env file","DB_HOST", os.Getenv("DB_HOST") )
+	godotenv.Load()
+	
+	sugar.Infow("config", "getConfig", "getting config...")
 	return &Config{
 		DB: &Database{
 			Host: os.Getenv("DB_HOST"),
@@ -44,12 +52,17 @@ func GetConfig(sugar *zap.SugaredLogger)*Config{
 			Port: os.Getenv("DB_PORT"),
 			SSlMode: os.Getenv("DB_SSL"),
 		},
-		Api: &Api{
-			Port: os.Getenv("APP_PORT"),
+		YooKassa: &YooKassa{
+			ID: os.Getenv("YOOKASSA_SHOP_ID"),
+			SecretKey: os.Getenv("YOOKASSA_STORE_SECRET_KEY"),
+			ReturnURL: os.Getenv("YOOKASSA_STORE_RETURN_URL"),
 		},
 		GRPC: &GRPC{
 			PaymentPort: os.Getenv("GRPC_PORT_PAYMENT"),
 			ConfirmPort: os.Getenv("GRPC_PORT_CONFIRM"),
+		},
+		HTTP: &HTTP{
+			Port: os.Getenv("HTTP_YOOKASSA_PORT"),
 		},
 	}
 }

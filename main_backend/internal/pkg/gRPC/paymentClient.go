@@ -12,18 +12,18 @@ import (
 )
 
 
-func GetMathClient(addr string,sugar *zap.SugaredLogger)(pb.MathServiceClient,*grpc.ClientConn){
+func GetPaymentClient(addr string,sugar *zap.SugaredLogger)(pb.UKassaPaymentClient,*grpc.ClientConn){
 	var conn *grpc.ClientConn
 	sugar.Infow(addr)
 		log.Println("Connecting to grpc...")
 		time.Sleep(time.Second * 1)
 		
-		conn,_ = grpc.NewClient(fmt.Sprintf("math:%s",addr),grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn,_ = grpc.NewClient(fmt.Sprintf("yookassa:%s",addr),grpc.WithTransportCredentials(insecure.NewCredentials()))
 		
 		
 		
 		
 	
-	client := pb.NewMathServiceClient(conn)
+	client := pb.NewUKassaPaymentClient(conn)
 	return client,conn
 }

@@ -6,16 +6,24 @@ services:
       context: ./main_backend
       dockerfile: Dockerfile
     ports:
-      - "${API_PORT}:8080"
+      - "${APP_PORT}:8080"
     depends_on:
       - db
-      - math
-  math:
+      - yookassa
+  # math:
+  #   env_file:
+  #     - .env
+  #   build: 
+  #     context: ./math
+  #     dockerfile: Dockerfile
+  yookassa:
     env_file:
       - .env
     build: 
-      context: ./math
+      context: ./ukassa_payment
       dockerfile: Dockerfile
+    ports:
+      - "${HTTP_YOOKASSA_PORT}:${HTTP_YOOKASSA_PORT}"
   db: 
     image: postgres:16-alpine
     restart: always
