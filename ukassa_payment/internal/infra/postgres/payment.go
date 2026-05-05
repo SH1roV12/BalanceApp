@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"gorm.io/gorm/clause"
 )
 
 
@@ -62,6 +64,18 @@ func(r *Repository) GetUserIDByExternalID(ctx context.Context,external_id string
 	}
 	return UserID,nil
 }
+
+func(r *Repository) GetStatusByExternalID(ctx context.Context,external_id string)(string,error){
+	var Status string
+	err := r.DB.WithContext(ctx).Clauses(clause.Locking{Strength: "UPDATE"}).
+	Model(&Transaction{}).Where("external_id = ?",external_id).Select("status").Scan(&Status).Error
+	if err != nil{
+		return "",err
+	}
+	return Status,nil
+	
+}
+
 
 
 var FailedUpdate error = errors.New("failed to update transaction ")

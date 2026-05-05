@@ -38,15 +38,16 @@ func NewService(repo repository.Repository,sdk *yookassa.PaymentHandler, cfg *co
 	}
 }
 
+//Create payment method
 func(s *Service)CreatePayment(ctx context.Context, dto request.CreatePayment)(string,error){
-	
+	//Generating id and creating transaction with status "created"
 	transactionId := uuid.GetID()
-	s.sugar.Infow("Payment","dto", dto)
 	err := s.repo.CreateTransaction(ctx,dto.UserId,transactionId,entity.Created,dto.Price)
 	if err != nil {
 		return "",err
 	}
 	
+	//Creating a transaction through SDK that sends a request to yookassa
 	payment,err := s.sdk.CreatePayment(ctx, &yoopayment.Payment{
 		ID: transactionId,
 		Amount: &yoocommon.Amount{
@@ -65,7 +66,7 @@ func(s *Service)CreatePayment(ctx context.Context, dto request.CreatePayment)(st
 	}
 	
 
-
+	//Getting payment url for user
 	var paymentURL string
 	if payment.Confirmation != nil {
     	if conf, ok := payment.Confirmation.(map[string]interface{}); ok {
@@ -77,6 +78,7 @@ func(s *Service)CreatePayment(ctx context.Context, dto request.CreatePayment)(st
 		return "", errors.New("failed to get url")
 	}
 
+	//Change transaction status to "in progress"
 	err = s.repo.UpdateTransaction(ctx, entity.InProgress,transactionId,payment.ID)
 	if err != nil {
     	return "", err
@@ -87,6 +89,7 @@ func(s *Service)CreatePayment(ctx context.Context, dto request.CreatePayment)(st
 
 
 func(s *Service)ConfirmPayment(ctx context.Context, dto request.ConfirmPayment)error{
+	//Checking status from webhook response from yookassa
 	if dto.Status != "succeeded"{
 		s.sugar.Infoln("waiting for payment...")
 		return nil
@@ -99,11 +102,35 @@ func(s *Service)ConfirmPayment(ctx context.Context, dto request.ConfirmPayment)e
 		}
 		return nil
 	}
-	err := s.repo.UpdateTransactionByExternalID(ctx,entity.Succeeded,dto.ID)
+
+	//Creating DB transaction with CallBack func
+	err := s.repo.Transaction(ctx,func(tx any) error {
+		txRepo := s.repo.WithTx(tx)
+		
+		status,err := txRepo.GetStatusByExternalID(ctx,dto.ID)
+		if err != nil{
+			return err
+		}
+		if status == entity.Succeeded{
+			return errors.New("transaction already succeeded")
+		}
+		//Change transaction status to "succeeded"
+		err = txRepo.UpdateTransactionByExternalID(ctx,entity.Succeeded,dto.ID)
+		if err != nil{
+			return err
+		}
+		return nil
+	})
+	if err != nil{
+		return err
+	}
+	
+	//Collecting data to send a confirmation to the main backend via grpc
 	userId,err := s.repo.GetUserIDByExternalID(ctx,dto.ID)
 	if err != nil{
 		return err
 	}
+
 	in := pb.ConfirmPaymentRequest{
 		UserId: userId,
 		Amount: dto.Amount,
