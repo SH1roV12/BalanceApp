@@ -9,6 +9,7 @@ type User struct{
 	Balance   float64
 	Email     string
 	Password  string
+	Role      Role
 }
 
 func NewUser(id,first_name,last_name,username string,balance float64, email,password string)*User{
@@ -22,3 +23,8 @@ func NewUser(id,first_name,last_name,username string,balance float64, email,pass
 		Password: password,
 	}
 }
+
+type Role string
+
+var UserRoleAdmin Role = "admin"
+var UserRoleUser  Role = "user"

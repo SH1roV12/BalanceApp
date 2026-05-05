@@ -30,7 +30,7 @@ func Start(){
 	confirmPaymentClient,conn := getclient.GetConfirmClient(config.GRPC.ConfirmPort,sugar)
 	defer conn.Close()
 	db := postgres.StartDB(config.DB,sugar)
-	repo := postgres.NewRepository(db)
+	repo := postgres.NewRepository(db.DB)
 	service := service.NewService(repo,paymentHandler,config.YooKassa,sugar,confirmPaymentClient)
 	ctx,cancel := signal.NotifyContext(context.Background(), os.Interrupt,syscall.SIGTERM)
 	defer cancel()
