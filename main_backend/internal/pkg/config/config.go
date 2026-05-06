@@ -22,10 +22,9 @@ type Database struct{
 }
 
 type GRPC struct{
+	YooKassaHost string
 	PaymentPort string
-	PaymentHost string
 	ConfirmPort string
-	
 }
 
 type Api struct{
@@ -52,6 +51,7 @@ func GetConfig(sugar *zap.SugaredLogger)*Config{
 		GRPC: &GRPC{
 			PaymentPort: os.Getenv("GRPC_PORT_PAYMENT"),
 			ConfirmPort: os.Getenv("GRPC_PORT_CONFIRM"),
+			YooKassaHost: os.Getenv("GRPC_YOOKASSA_HOST"),
 		},
 	}
 }
