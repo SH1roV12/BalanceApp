@@ -1,0 +1,35 @@
+services:
+  app:
+    env_file:
+      - .env
+    build: 
+      context: ./main_backend
+      dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT}:8080"
+    depends_on:
+      - db
+      - yookassa
+  # math:
+  #   env_file:
+  #     - .env
+  #   build: 
+  #     context: ./math
+  #     dockerfile: Dockerfile
+  yookassa:
+    env_file:
+      - .env
+    build: 
+      context: ./ukassa_payment
+      dockerfile: Dockerfile
+    ports:
+      - "${HTTP_YOOKASSA_PORT}:${HTTP_YOOKASSA_PORT}"
+  db: 
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
