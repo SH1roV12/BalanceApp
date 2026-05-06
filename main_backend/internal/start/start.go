@@ -28,7 +28,7 @@ func Start(){
 	sugar.Infow("Balance app is starting...")
 	time.Sleep(time.Second * 3)
 	config := config.GetConfig(sugar)
-	paymentClient,conn := grpc.GetPaymentClient(config.GRPC.PaymentPort,sugar)
+	paymentClient,conn := grpc.GetPaymentClient(*config.GRPC,sugar)
 	
 	defer conn.Close()
 	db := postgres.StartDB(config.DB, sugar)

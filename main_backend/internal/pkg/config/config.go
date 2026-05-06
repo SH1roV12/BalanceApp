@@ -23,7 +23,9 @@ type Database struct{
 
 type GRPC struct{
 	PaymentPort string
+	PaymentHost string
 	ConfirmPort string
+	
 }
 
 type Api struct{
