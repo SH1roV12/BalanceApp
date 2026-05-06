@@ -12,7 +12,7 @@ func SetupRoutes(app *fiber.App,handlers *handler.Handlers,sugar *zap.SugaredLog
 	
 	
 	auth := api.Group("/auth",middleware.JWTMidleware)
-	auth.Post("/sum", handlers.CreatePayment)
+	auth.Post("/payment", handlers.CreatePayment)
 	api.Post("/new",handlers.Register)
 	api.Get("/users",handlers.GetAllUsers)
 	api.Get("/refresh",handlers.Refresh)
