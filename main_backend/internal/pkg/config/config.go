@@ -29,13 +29,11 @@ type GRPC struct{
 
 type Api struct{
 	Port string
+	Access_Secret string
+	Refresh_Secret string
 }
 func GetConfig(sugar *zap.SugaredLogger)*Config{
-	// err := godotenv.Load()
-	// if err != nil{
-	// 	sugar.Infow("Failed to load .env")
-	// }
-	sugar.Infow("env file","DB_HOST", os.Getenv("DB_HOST") )
+	
 	return &Config{
 		DB: &Database{
 			Host: os.Getenv("DB_HOST"),
@@ -47,6 +45,8 @@ func GetConfig(sugar *zap.SugaredLogger)*Config{
 		},
 		Api: &Api{
 			Port: os.Getenv("APP_PORT"),
+			Access_Secret: getEnv("JWT_ACCESS_SECRET",sugar),
+			Refresh_Secret: getEnv("JWT_REFRESH_SECRET",sugar),
 		},
 		GRPC: &GRPC{
 			PaymentPort: os.Getenv("GRPC_PORT_PAYMENT"),
@@ -54,4 +54,12 @@ func GetConfig(sugar *zap.SugaredLogger)*Config{
 			YooKassaHost: os.Getenv("GRPC_YOOKASSA_HOST"),
 		},
 	}
+}
+
+func getEnv(key string, sugar *zap.SugaredLogger)string{
+	value := os.Getenv(key)
+	if value == ""{
+		sugar.Fatalln("Critical environment variable is missing", "variable", key)
+	}
+	return value
 }

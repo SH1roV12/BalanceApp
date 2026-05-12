@@ -18,8 +18,8 @@ import (
 
 func StartApi(config *config.Config, userService *service.UserService,paymentService paymentservice.PaymentService,ctx context.Context,sugar *zap.SugaredLogger)error{
 	app := fiber.New()
-	handlers := handler.NewHandlers(userService,&paymentService,sugar)
-	http.SetupRoutes(app,handlers,sugar)
+	handlers := handler.NewHandlers(userService,&paymentService,sugar,config.Api)
+	http.SetupRoutes(app,handlers,sugar,*config.Api)
 
 
 	errChan := make(chan error,1)

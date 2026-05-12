@@ -3,14 +3,18 @@ package middleware
 import (
 	"log"
 
+	"github.com/SH1roV12/balance/internal/pkg/config"
 	"github.com/SH1roV12/balance/internal/pkg/jwt"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )
 
 
-func JWTMidleware(c *fiber.Ctx)error{
-	user_id,err := jwt.ParseAccessToken(c)
+
+
+func JWTMidleware(cfg *config.Api)fiber.Handler{
+	return func(c *fiber.Ctx)error{
+	user_id,err := jwt.ParseAccessToken(c,cfg)
 	if err != nil{
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error":"empty or invalid token"})
 	}
@@ -19,6 +23,8 @@ func JWTMidleware(c *fiber.Ctx)error{
 	return c.Next()
 
 }
+}
+
 
 func Logger(sugar *zap.SugaredLogger)fiber.Handler{
 	return func(c *fiber.Ctx)error{

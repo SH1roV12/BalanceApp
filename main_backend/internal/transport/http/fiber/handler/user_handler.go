@@ -54,12 +54,12 @@ func (h *Handlers) Login(ctx *fiber.Ctx)error{
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error":err.Error()}) // Match to password wrong 
 	}
 	
-	access,err := jwt.GenAccessToken(user.ID,h.sugar)
+	access,err := jwt.GenAccessToken(user.ID,h.sugar,h.config)
 	if err != nil{
 		h.sugar.Errorw("jwt_refresh","get access token", "error", err)
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error":err.Error()})
 	}
-	refresh,err := jwt.GenRefreshToken(user.ID,h.sugar)
+	refresh,err := jwt.GenRefreshToken(user.ID,h.sugar,h.config)
 	if err != nil{
 		h.sugar.Errorw("jwt_refresh", "get refresh token","error", err)
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error":err.Error()})
@@ -101,17 +101,17 @@ func(h *Handlers)GetAllUsers(ctx *fiber.Ctx)error{
 
 
 func(h *Handlers)Refresh(ctx *fiber.Ctx)error{
-	user_id,err := jwt.ParseRefreshToken(ctx)
+	user_id,err := jwt.ParseRefreshToken(ctx,h.config)
 	if err != nil{
 		h.sugar.Errorw("jwt_refresh", "error", err)
 		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error":"empty or invalid token"})
 	}
-	access,err := jwt.GenAccessToken(user_id,h.sugar)
+	access,err := jwt.GenAccessToken(user_id,h.sugar,h.config)
 	if err != nil{
 		h.sugar.Errorw("jwt_refresh","get access token", "error", err)
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error":"failed to generate new access token"})
 	}
-	refresh,err := jwt.GenRefreshToken(user_id,h.sugar)
+	refresh,err := jwt.GenRefreshToken(user_id,h.sugar,h.config)
 	if err != nil{
 		h.sugar.Errorw("jwt_refresh", "get refresh token","error", err)
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error":"failed to generate new refresh token"})
